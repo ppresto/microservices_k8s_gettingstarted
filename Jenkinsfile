@@ -18,6 +18,25 @@ spec:
   # Use service account that can deploy to all namespaces
   serviceAccountName: cd-jenkins
   containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug-539ddefcae3fd6b411a95982a830d987f4214251
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: jenkins-docker-cfg
+        mountPath: /root
+  volumes:
+  - name: jenkins-docker-cfg
+    projected:
+      sources:
+      - secret:
+          name: regcred
+          items:
+            - key: .dockerconfigjson
+              path: .docker/config.json
+
   - name: python
     image: python:3.6.6-alpine
     command:
@@ -47,15 +66,6 @@ spec:
 }
   }
   stages {
-    stage('Test') {
-      steps {
-        container('openjdk') {
-          sh """
-            ls -al
-          """
-        }
-      }
-    }
     stage('Build webapp') {
       steps {
         container('openjdk') {
@@ -64,9 +74,23 @@ spec:
             mvn install
           """
         }
-
       }
     }
+    stage('Build Container') {
+      environment {
+        PATH = "/busybox:/kaniko:$PATH"
+      }
+      steps {
+        //git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
+        container(name: 'kaniko', shell: '/busybox/sh') {
+            sh '''#!/busybox/sh
+            cd sa-webapp
+            /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=https://index.docker.io:443/v1/ppresto/sentiment-analysis-webapp
+            '''
+        }
+      }
+    }
+
     stage('Deploy Canary') {
       // Canary branch
       when { branch 'canary' }
