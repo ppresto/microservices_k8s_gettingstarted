@@ -16,7 +16,7 @@ spec:
         app: sa-web-app
     spec:
       containers:
-      - image: ppresto/sentiment-analysis-webapp
+      - image: ppresto/sentiment-analysis-webapp:latest
         imagePullPolicy: Always
         name: sa-web-app
         env:

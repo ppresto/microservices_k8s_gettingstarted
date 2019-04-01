@@ -9,4 +9,7 @@ kubectl apply -f sa-frontend-deployment.yaml --record
 kubectl get pods --show-labels
 
 # Watch rolling deployment
-kubectl rollout status deployment sa-frontend
+# kubectl rollout status deployment sa-frontend
+
+# Scale replica count up/down
+# kubectl scale --replicas=1 -f sa-frontend-deployment.yaml
