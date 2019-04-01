@@ -29,7 +29,7 @@ spec:
     - cat
     tty: true
   - name: openjdk
-    image: openjdk:8-jdk-alpine
+    image: ppresto/myopenjdk:latest
     command:
     - cat
     tty: true
