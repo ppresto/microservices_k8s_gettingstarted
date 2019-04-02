@@ -81,13 +81,14 @@ spec:
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'ppresto', passwordVariable: 'gitPass', usernameVariable: 'gitUser')]) {
-        //git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
-        container(name: 'kaniko', shell: '/busybox/sh') {
-            sh '''#!/busybox/sh
-            echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"username\":\"$gitUser\",\"password\":\"$gitPass\"}}}" > /kaniko/.docker/config.json
-            cd sa-webapp
-            /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=https://index.docker.io:443/v1/ppresto/sentiment-analysis-webapp
-            '''
+          //git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
+          container(name: 'kaniko', shell: '/busybox/sh') {
+              sh '''#!/busybox/sh
+              echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"username\":\"$gitUser\",\"password\":\"$gitPass\"}}}" > /kaniko/.docker/config.json
+              cd sa-webapp
+              /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=https://index.docker.io:443/v1/ppresto/sentiment-analysis-webapp
+              '''
+          }
         }
       }
     }
